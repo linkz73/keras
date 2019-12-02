@@ -1,0 +1,24 @@
+인공지능을 위한 설치
+
+1. visual studio code
+2. 마켓에서 설치 : python, python for vscode, python extension pack, python extended, korean language pack 설치
+
+실행
+py 파일 작성 후 ctrl + F5
+
+
+단축키
+한줄 복사 : ctrl + c
+<< 
+github 계정 생성
+keras - repository 생성
+kaggle.com
+
+
+============
+신경망
+input layer
+hidden layer
+output layer
+
+레이어, 노드, 파라미터 : ai developer 
