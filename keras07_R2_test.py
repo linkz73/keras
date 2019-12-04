@@ -10,13 +10,12 @@ y_test = np.array([11,12,13,14,15,16,17,18,19,20])
 
 model = Sequential()
 # model.add(Dense(100, input_dim=1, activation='relu'))
-model.add(Dense(500, input_shape=(1, ), activation='relu'))
+model.add(Dense(1000, input_shape=(1, ), activation='relu'))
 model.add(Dense(500))
 model.add(Dense(500))
 model.add(Dense(500))
-model.add(Dense(500))
-model.add(Dense(500))
-model.add(Dense(500))
+model.add(Dense(50))
+model.add(Dense(50))
 model.add(Dense(1))
 
 model.summary()
@@ -24,7 +23,7 @@ model.summary()
 # model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 # acc :  1.0 , loss :  2.7284841053187847e-12
 model.compile(loss='mse', optimizer='adam', metrics=['mse'])
-model.fit(x_train, y_train, epochs=300, batch_size=1)
+model.fit(x_train, y_train, epochs=200, batch_size=1)
 
 loss, mse = model.evaluate(x_test, y_test)  #a[0], a[1]
 print("mse : ", mse)
@@ -48,3 +47,22 @@ print("R2 : ", r2_y_predict)
 # 레이어는 인풋과 아웃풋 포함 5개 이상, 노드는 각 레이어당 5개 이상
 # batch_size = 1
 # epochs = 100 이상
+
+
+# 실행결과
+"""
+mse :  3.3843331336975098
+loss :  3.3843331336975098
+[[ 9.782363]
+ [10.639115]
+ [11.499335]
+ [12.362111]
+ [13.230191]
+ [14.099338]
+ [14.98854 ]
+ [15.884316]
+ [16.781414]
+ [17.679428]]
+RMSE :  1.8396556624803262
+R2 :  0.589777823455039
+"""
