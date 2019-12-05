@@ -1,12 +1,13 @@
 #1. 데이터
-# Multi Layer Perceptron
 import numpy as np
-x = np.array([range(1, 101), range(101, 200)])
-y = np.array([range(1, 101), range(101, 200)])
+x = np.array(range(1,201)).reshape((2,100))
+y = np.array(range(1,201)).reshape((2,100))
+# x = np.array([range(1, 101), range(101, 200)])
+# y = np.array([range(1, 101), range(101, 200)])
 print(x)
 print(x.shape)
-x = np.transpose(x)
-y = np.transpose(y)
+# x = np.transpose(x)
+# y = np.transpose(y)
 print(x)
 print(x.shape)
 
@@ -32,7 +33,7 @@ from keras.layers import Dense
 model = Sequential()
 
 # model.add(Dense(100, input_dim=1, activation='relu'))
-model.add(Dense(100, input_shape=(1, ), activation='relu'))
+model.add(Dense(100, input_shape=(2, ), activation='relu'))
 model.add(Dense(100))
 model.add(Dense(10))
 model.add(Dense(10))

@@ -1,5 +1,6 @@
 #1. 데이터
 import numpy as np
+
 x = np.array(range(1, 101))
 y = np.array(range(1, 101))
 print(x)
