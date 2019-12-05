@@ -1,30 +1,23 @@
 #1. 데이터
 import numpy as np
-x = np.array(range(1,201)).reshape((2,100))
-y = np.array(range(1,201)).reshape((2,100))
-# x = np.array([range(1, 101), range(101, 200)])
-# y = np.array([range(1, 101), range(101, 200)])
-print(x)
-print(x.shape)
+
+x = np.array([range(1, 101), range(101, 201)])
+y = np.array([range(201, 301)])
+# print(x)
+print(x.shape)  # (2, 100)
+
 x = np.transpose(x)
 y = np.transpose(y)
-print(x)
-print(x.shape)
-
-# x_train = x[:60]
-# x_val = x[60:80]
-# x_test = x[80:]
-# y_train = y[:60]
-# y_val = y[60:80]
-# y_test = y[80:]
+print(x.shape)  # (100, 2)
 
 from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import cross_val_score
-# train, test 둘다 적용시 train 이 적용됨.
-x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=3, test_size=0.4)
-x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, random_state=3, test_size=0.5)
+# train, test 둘다 적용시 train 이 적용됨. train_test_split : 컬럼의 차이가 있어도 행 길이 알아서 자름.
+x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=3, test_size=0.4, shuffle=False)
+x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, random_state=3, test_size=0.5, shuffle=False)
 
-print(f"x_train:{len(x_train)}, x_test:{len(x_test)}, x_val:{len(x_val)}")
+# print(f"x_train:{len(x_train)}, x_test:{len(x_test)}, x_val:{len(x_val)}")
+# print(f"y_train:{len(y_train)}, y_test:{len(y_test)}, x_val:{len(y_val)}")
 
 #2. 모델구성
 from keras.models import Sequential
@@ -32,9 +25,12 @@ from keras.layers import Dense
 model = Sequential()
 
 # model.add(Dense(100, input_dim=1, activation='relu'))
-model.add(Dense(10, input_shape=(2,), activation='relu'))
-model.add(Dense(5))
-model.add(Dense(4))
+model.add(Dense(50, input_shape=(2,), activation='relu'))
+model.add(Dense(500))
+model.add(Dense(500))
+model.add(Dense(500))
+model.add(Dense(500))
+model.add(Dense(600))
 model.add(Dense(1))
 model.summary()
 
@@ -42,7 +38,7 @@ model.summary()
 # model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 model.compile(loss='mse', optimizer='adam', metrics=['mse'])
 # model.fit(x_train, y_train, epochs=100, batch_size=1)
-model.fit(x_train, y_train, epochs=100, batch_size=1, validation_data=(x_val, y_val))
+model.fit(x_train, y_train, epochs=110, batch_size=1, validation_data=(x_val, y_val))
 
 # 4. 평가 예측
 loss, mse = model.evaluate(x_test, y_test, batch_size=1)  #a[0], a[1]

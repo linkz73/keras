@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 import pandas.io.sql as pdsql
-from pandasql import sqldf
+# from pandasql import sqldf
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -94,34 +94,34 @@ def convZigzag(p):
     plt.show()
     return pivots
 
-
+'''
 시작일자 = '2019-10-10'
 종료일자 = '2019-11-30'
 거래소 = "upbit"
 종목 = 'BTC/KRW'
 frame = '30m'
 테이블 = f"data_{frame}_{거래소}"
+'''
 
-
-df = get_price(종목, 시작일자, 종료일자, 테이블)
-df = pd.to
+# df = get_price(종목, 시작일자, 종료일자, 테이블)
+df = pd.read_csv('price/dataset/eth.csv')
 print(df.head())
-
+'''
 df['ZigZag'] = convZigzag(df)
 # df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
 df['TREND'] = df['ZigZag'].replace(to_replace=0, method='ffill')
 trends = df['TREND'].values
 print(trends)
-
-high_prices = df['high'].values
-low_prices = df['low'].values
+'''
+high_prices = df['High'].values
+low_prices = df['Low'].values
 mid_prices = (high_prices + low_prices) / 2
 seq_len = 50
 sequence_length = seq_len + 1
 
 result = []
-for index in range(len(trends) - sequence_length):
-    result.append(trends[index: index + sequence_length])
+for index in range(len(mid_prices) - sequence_length):
+    result.append(mid_prices[index: index + sequence_length])
 
 def normalize_windows(data):
     normalized_data = []
@@ -150,7 +150,7 @@ x_train.shape, x_test.shape
 
 model = Sequential()
 model.add(LSTM(50, return_sequences=True, input_shape=(50, 1)))
-model.add(Dropout(0.2))  # 과적합을 피하기 위한 drop out 20% 설정
+model.add(Dropout(0.5))  # 과적합을 피하기 위한 drop out 20% 설정
 model.add(LSTM(64, return_sequences=False))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='rmsprop')
@@ -161,20 +161,18 @@ start_time = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
 model.fit(x_train, y_train,
     validation_data=(x_test, y_test),
     batch_size=10,
-    epochs=10,
+    epochs=20,
     callbacks=[
         # TensorBoard(log_dir='logs/%s' % (start_time)),
-        ModelCheckpoint('./models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
+        ModelCheckpoint('./price/models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
         ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=1, mode='auto')
 ])
-
 
 # 예측 결과를 그래프로 표현
 pred = model.predict(x_test)
 
 fig = plt.figure(facecolor='white', figsize=(20, 10))
 ax = fig.add_subplot(111)
-ax.plot(df['close'], label='price')
 ax.plot(y_test, label='True')
 ax.plot(pred, label='Prediction')
 ax.legend()
