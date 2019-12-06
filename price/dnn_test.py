@@ -39,7 +39,8 @@ def comma_percent(x, pos):  # formatter function takes tick label and tick posit
 def convZigzag(p):    
     # from zigzag import *
     p = p.set_index(p['date'].values)
-    p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
+    # p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
+    p['date1'] = pd.to_datetime(p['date'])
     pivots = peak_valley_pivots(p['close'].values, 0.02, -0.02)
     fig = plt.figure(constrained_layout=False,figsize=(20,7))
     gs = GridSpec(1, 1, figure=fig)
@@ -47,8 +48,9 @@ def convZigzag(p):
     
     ts_pivots = pd.Series(p['close'], index=p.index)
     ts_pivots = ts_pivots[pivots != 0]
-    print("date : ", p['date'])
-    p['date'] = p['date'].apply(lambda x:datetime.datetime.strptime(x, "%d.%M.%y"))
+    print("date : ", p['date1'])
+    # p['date'] = p['date'].apply(lambda x:datetime.datetime.strptime(x, "%d.%M.%y"))
+    p.set_index(p['date'])
     p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax1.plot(p.index, p['close'])
