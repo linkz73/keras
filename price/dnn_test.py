@@ -2,7 +2,7 @@ import pandas as pd
 from pandas import DataFrame
 import pandas.io.sql as pdsql
 # from pandasql import sqldf
-
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -22,10 +22,6 @@ import warnings
 import sys
 warnings.filterwarnings("ignore")
 
-def mysqlconn():
-    conn = pymysql.connect(host=host, port=port, user=user, passwd=passw, db=database, charset='utf8mb4', use_unicode=True)
-    return conn
-
 def comma_volume(x, pos):  # formatter function takes tick label and tick position
     s = '{:0,d}K'.format(int(x/1000))
     return s
@@ -38,41 +34,6 @@ def comma_percent(x, pos):  # formatter function takes tick label and tick posit
     s = '{:+.2f}'.format(x)
     return s
 
-def get_price(code, 시작일자=None, 종료일자=None, 테이블='data_1d_binance'):
-    if 시작일자 is None and 종료일자 is None:
-        _query = f"""
-            SELECT date,open,high,low,close,volume
-            FROM {테이블}
-            WHERE symbol='{code}'
-            ORDER BY date ASC
-            """
-    if 시작일자 is not None and 종료일자 is None:
-        _query = f"""
-            SELECT date,open,high,low,close,volume
-            FROM {테이블}
-            WHERE symbol='{code}' AND date >= '{시작일자}'
-            ORDER BY date ASC
-            """
-    if 시작일자 is None and 종료일자 is not None:
-        _query = f"""
-            SELECT date,open,high,low,close,volume
-            FROM {테이블}
-            WHERE symbol='{code}' AND date <= '{종료일자}'
-            ORDER BY date ASC
-            """
-    if 시작일자 is not None and 종료일자 is not None:
-        _query = f"""
-            SELECT date,open,high,low,close,volume
-            FROM {테이블}
-            WHERE symbol='{code}' AND date BETWEEN '{시작일자}' AND '{종료일자}'
-            ORDER BY date ASC
-            """
-
-    conn = mysqlconn()
-    _df = pdsql.read_sql_query(_query, con=conn)
-    conn.close()
-
-    return _df
 
 # zigzag 항목 추가
 def convZigzag(p):    
@@ -86,7 +47,8 @@ def convZigzag(p):
     
     ts_pivots = pd.Series(p['close'], index=p.index)
     ts_pivots = ts_pivots[pivots != 0]
-    
+    print("date : ", p['date'])
+    p['date'] = p['date'].apply(lambda x:datetime.datetime.strptime(x, "%d.%M.%y"))
     p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax1.plot(p.index, p['close'])
@@ -106,15 +68,15 @@ frame = '30m'
 # df = get_price(종목, 시작일자, 종료일자, 테이블)
 df = pd.read_csv('price/dataset/eth.csv')
 print(df.head())
-'''
+
 df['ZigZag'] = convZigzag(df)
 # df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
 df['TREND'] = df['ZigZag'].replace(to_replace=0, method='ffill')
 trends = df['TREND'].values
 print(trends)
-'''
-high_prices = df['High'].values
-low_prices = df['Low'].values
+
+high_prices = df['high'].values
+low_prices = df['low'].values
 mid_prices = (high_prices + low_prices) / 2
 seq_len = 50
 sequence_length = seq_len + 1
