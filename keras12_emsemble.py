@@ -61,23 +61,23 @@ model.summary()
 
 # 3. 훈련
 model.compile(loss='mse', optimizer='adam', metrics=['mse'])
-model.fit(x1_train, y1_train, epochs=100, batch_size=1, validation_data=(x1_val, y1_val))
+model.fit([x1_train,x2_train], [y1_train,y2_train], epochs=100, batch_size=1, validation_data=([x1_val,x2_val], [y1_val,y2_val]))
 
 # 4. 평가 예측
-loss, mse = model.evaluate(x1_test, y1_test, batch_size=1)  #a[0], a[1]
-print("mse : ", mse)
-print("loss : ", loss)
+# loss, mse = model.evaluate([x1_test,x2_test], [y1_test,y2_test],  batch_size=1)  #a[0], a[1]
+# print("mse : ", mse)
+# print("loss : ", loss)
 
-y_predict = model.predict(x1_test)
+y_predict = model.predict([x1_test,x2_test])
 print(y_predict)
 
 # RMSE 구하는 수식 추가
 from sklearn.metrics import mean_squared_error
 def RMSE(y_test, y_predict):
     return np.sqrt(mean_squared_error(y_test, y_predict))
-print("RMSE : ", RMSE(y1_test, y_predict))
+print("RMSE : ", RMSE([y1_test,y2_test], y_predict))
 
 # R2 구하기
 from sklearn.metrics import r2_score
-r2_y_predict = r2_score(y1_test, y_predict)
+r2_y_predict = r2_score([y1_test,y2_test], y_predict)
 print("R2 : ", r2_y_predict)
