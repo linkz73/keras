@@ -1,4 +1,4 @@
-# input 2 -> output 3
+# input 2 -> output 1
 
 #1. 데이터
 import numpy as np

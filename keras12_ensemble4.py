@@ -1,6 +1,6 @@
-# input 2 -> output 3
+# input 1 -> output 2
 
-#1. 데이터
+# 1. 데이터
 import numpy as np
 
 x1 = np.array([range(100), range(311,411), range(100)])
