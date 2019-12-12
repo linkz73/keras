@@ -23,6 +23,7 @@ print(y1.shape)
 print(y2.shape)
 print(y3.shape)
 
+# train : test : val = 6 : 2 : 2
 from sklearn.model_selection import train_test_split
 x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y1, shuffle=False, random_state=3, test_size=0.4)
 x1_val, x1_test, y1_val, y1_test = train_test_split(x1_test, y1_test, random_state=3, test_size=0.5)
@@ -31,9 +32,11 @@ x2_val, x2_test, y2_val, y2_test = train_test_split(x2_test, y2_test, random_sta
 y3_train, y3_test = train_test_split(y3, shuffle=False, random_state=3, test_size=0.4)
 y3_val, y3_test = train_test_split(y3_test, shuffle=False, random_state=3, test_size=0.5)
 
-print(f"x1_train:{x1_train.shape}, x1_test:{len(x1_test)}, x1_val:{len(x1_val)}")
-print(f"x2_train:{x2_train.shape}, x2_test:{len(x2_test)}, x2_val:{len(x2_val)}")
-print(f"y3_train:{y3_train.shape}, y3_test:{len(y3_test)}, y3_val:{len(y3_val)}")
+print(f"x1_train:{x1_train.shape}, x1_test:{x1_test.shape}, x1_val:{x1_val.shape}")
+print(f"x2_train:{x2_train.shape}, x2_test:{x2_test.shape}, x2_val:{x2_val.shape}")
+print(f"y1_train:{y1_train.shape}, y1_test:{y1_test.sahape}, y1_val:{y1_val.sahape}")
+print(f"y2_train:{y2_train.shape}, y2_test:{y2_test.sahape}, y2_val:{y2_val.sahape}")
+print(f"y3_train:{y3_train.shape}, y3_test:{y3_test.sahape}, y3_val:{y3_val.sahape}")
 
 #2. 모델구성
 from keras.models import Sequential, Model
@@ -41,16 +44,16 @@ from keras.layers import Dense, Input
 # model = Sequential()
 # 순차형 모델과 시퀀셜 모델의 차이 : 인풋과 아웃풋을 명시적으로 표현
 input1 = Input(shape=(3,))
-dense1 = Dense(5, activation='relu')(input1)
-dense2 = Dense(10)(dense1)
-dense3 = Dense(4)(dense2)
-middle1 = Dense(3)(dense3)
+dense = Dense(5, activation='relu')(input1)
+dense = Dense(10)(dense)
+dense = Dense(4)(dense)
+middle1 = Dense(3)(dense)
 
 input2 = Input(shape=(3,))  #  shape는 컬럼 형태 표시
-xx = Dense(5, activation='relu')(input1)
-xx = Dense(10)(xx)
-xx = Dense(4)(xx)
-middle2 = Dense(3)(xx)
+dense = Dense(5, activation='relu')(input2)
+dense = Dense(10)(dense)
+dense = Dense(4)(dense)
+middle2 = Dense(3)(dense)
 
 from keras.layers.merge import concatenate
 merge1 = concatenate([middle1, middle2])  # output 만 묶어 주면 됨.
@@ -99,7 +102,7 @@ RMSE3 = RMSE(y3_test, y3_predict)
 print("RMSE-1 : ", RMSE1)
 print("RMSE-2 : ", RMSE2)
 print("RMSE-3 : ", RMSE3)
-print("RMSE : ", (RMSE1 + RMSE2 + RMSE3)/2)
+print("RMSE : ", (RMSE1 + RMSE2 + RMSE3)/3)
 
 # R2 구하기
 from sklearn.metrics import r2_score
@@ -109,4 +112,4 @@ r2_y3_predict = r2_score(y3_test, y3_predict)
 print("R2-1 : ", r2_y1_predict)
 print("R2-2 : ", r2_y2_predict)
 print("R2-3 : ", r2_y3_predict)
-print("R2 : ", (r2_y1_predict + r2_y2_predict + r2_y3_predict)/2)
+print("R2 : ", (r2_y1_predict + r2_y2_predict + r2_y3_predict)/3)
