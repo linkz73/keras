@@ -19,10 +19,15 @@ print(y2.shape)
 
 # train : test : val = 6 : 2 : 2
 from sklearn.model_selection import train_test_split
-x1_train, x1_test = train_test_split(x1, shuffle=False, random_state=3, test_size=0.4)
-x1_val, x1_test = train_test_split(x1_test, shuffle=False, random_state=3, test_size=0.5)
-y1_train, y1_test, y2_train, y2_test = train_test_split(y1, y2, shuffle=False, random_state=3, test_size=0.4)
-y1_val, y1_test, y2_val, y2_test = train_test_split(y1_test, y2_test, random_state=3, test_size=0.5)
+# x1_train, x1_test = train_test_split(x1, shuffle=False, random_state=3, test_size=0.4)
+# x1_val, x1_test = train_test_split(x1_test, shuffle=False, random_state=3, test_size=0.5)
+# y1_train, y1_test, y2_train, y2_test = train_test_split(y1, y2, shuffle=False, random_state=3, test_size=0.4)
+# y1_val, y1_test, y2_val, y2_test = train_test_split(y1_test, y2_test, random_state=3, test_size=0.5)
+
+x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y1, shuffle=False, random_state=3, test_size=0.4)
+x1_val, x1_test, y1_val, y1_test = train_test_split(x1_test, y1_test, random_state=3, test_size=0.5)
+y2_train, y2_test = train_test_split(y2, shuffle=False, random_state=3, test_size=0.4)
+y2_val, y2_test = train_test_split(y2_test, shuffle=False, random_state=3, test_size=0.5)
 
 print(f"x1_train:{x1_train.shape}, x1_test:{x1_test.shape}, x1_val:{x1_val.shape}")
 print(f"y1_train:{y1_train.shape}, y1_test:{y1_test.shape}, y1_val:{y1_val.shape}")
