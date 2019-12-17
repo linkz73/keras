@@ -35,12 +35,28 @@ def comma_percent(x, pos):  # formatter function takes tick label and tick posit
     return s
 
 
-# zigzag 항목 추가
+# # zigzag 항목 추가
+# def convZigzag(p):    
+#     # from zigzag import *
+#     p = p.set_index(p['date'].values)
+#     p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
+#     pivots = peak_valley_pivots(p['close'].values, 0.03, -0.03)
+#     fig = plt.figure(constrained_layout=False,figsize=(20,7))
+#     gs = GridSpec(1, 1, figure=fig)
+#     ax1 = fig.add_subplot(gs[0])
+    
+#     ts_pivots = pd.Series(p['close'], index=p.index)
+#     ts_pivots = ts_pivots[pivots != 0]
+    
+#     p['date'] = p.index.map(mdates.date2num)
+#     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+#     ax1.plot(p.index, p['close'])
+#     ts_pivots.plot(style='g-o')
+#     return pivots
+
 def convZigzag(p):    
-    # from zigzag import *
     p = p.set_index(p['date'].values)
-    # p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
-    p['date1'] = pd.to_datetime(p['date'])
+    p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
     pivots = peak_valley_pivots(p['close'].values, 0.02, -0.02)
     fig = plt.figure(constrained_layout=False,figsize=(20,7))
     gs = GridSpec(1, 1, figure=fig)
@@ -48,9 +64,7 @@ def convZigzag(p):
     
     ts_pivots = pd.Series(p['close'], index=p.index)
     ts_pivots = ts_pivots[pivots != 0]
-    print("date : ", p['date1'])
-    # p['date'] = p['date'].apply(lambda x:datetime.datetime.strptime(x, "%d.%M.%y"))
-    p.set_index(p['date'])
+
     p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax1.plot(p.index, p['close'])
@@ -68,7 +82,7 @@ frame = '30m'
 '''
 
 # df = get_price(종목, 시작일자, 종료일자, 테이블)
-df = pd.read_csv('price/dataset/eth.csv')
+df = pd.read_csv('price/dataset/btcusdt_30m.csv')
 print(df.head())
 
 df['ZigZag'] = convZigzag(df)
@@ -82,6 +96,11 @@ low_prices = df['low'].values
 mid_prices = (high_prices + low_prices) / 2
 seq_len = 50
 sequence_length = seq_len + 1
+
+# from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
+# scaler = MaxAbsScaler()
+# scaler.fit(x)  # fit 을 하면서 가중치가 생성됨.
+# x = scaler.transform(x)
 
 result = []
 for index in range(len(mid_prices) - sequence_length):
