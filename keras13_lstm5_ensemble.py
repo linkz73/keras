@@ -7,10 +7,12 @@ from keras.layers import LSTM, Dropout, Dense, Activation
 # 1. 데이터
 x = array([[1,2,3], [2,3,4], [3,4,5], [4,5,6], [5,6,7], [6,7,8], [7,8,9], [8,9,10], 
             [9,10,11], [10,11,12], [20,30,40], [30,40,50], [40,50,60]])
-x1 = x[0:3]
-x2 = x[10:]
+
+# Todo : 임의로 데이터를 자르는 것은 데이터 조작에 해당함. 따라서 (10,3), (3,3) 두 데이터를 (13,3) 로 합쳐서 작업해야 함.
+x1 = x[:10, :]  
+x2 = x[10:, :]
 y = array([4,5,6,7,8,9,10,11,12,13,50,60,70])
-y1 = y[0:3]
+y1 = y[:10]
 y2 = y[10:]
 print(x1)
 print(x2)
@@ -61,7 +63,8 @@ from keras.callbacks import EarlyStopping
 
 early_stopping = EarlyStopping(monitor='loss', patience=10, mode='auto')
 # model.fit(x, y, epochs=100, verbose=2)
-model.fit([x1,x2], [y1,y2], epochs=80000, callbacks=[early_stopping])
+model.fit([x1,x1], [y1,y1], epochs=80000, callbacks=[early_stopping])
+# model.fit([x1,x2], [y1,y2], epochs=80000, callbacks=[early_stopping])
 
 # predict 용 데이터
 x1_input = array([10,11,12])  # 1,3, ????

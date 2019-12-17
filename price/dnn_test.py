@@ -115,8 +115,10 @@ x_train.shape, x_test.shape
 model = Sequential()
 model.add(LSTM(50, return_sequences=True, input_shape=(50, 1)))
 model.add(Dropout(0.5))  # 과적합을 피하기 위한 drop out 20% 설정
+# return_sequences=False 디폴트 값
 model.add(LSTM(64, return_sequences=False))
 model.add(Dense(1, activation='linear'))
+
 model.compile(loss='mse', optimizer='rmsprop')
 model.summary()
 
@@ -134,7 +136,7 @@ model.fit(x_train, y_train,
 
 # 예측 결과를 그래프로 표현
 pred = model.predict(x_test)
-
+print(pred)
 fig = plt.figure(facecolor='white', figsize=(20, 10))
 ax = fig.add_subplot(111)
 ax.plot(y_test, label='True')

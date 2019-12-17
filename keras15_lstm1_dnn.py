@@ -23,14 +23,14 @@ dataset = split_x(b, size)
 print("================")
 print(dataset)
 
-x_train = dataset[:,0:-1]
-y_train = dataset[:,-1]
+x_train = dataset[:, 0:-1]
+y_train = dataset[:, -1]
 # print(x_train)
 print(x_train.shape)  # (6,4)
 # print(y_train)
 print(y_train.shape)  # (6,)
 
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import cross_val_score
 # train, test 둘다 적용시 train 이 적용됨.
 

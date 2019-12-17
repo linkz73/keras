@@ -13,6 +13,16 @@ from keras.layers import Activation, Dense
 from keras.layers import LSTM
 from keras.layers import Dropout
 
+neurons = 512                 
+activation_function = 'tanh'  
+loss = 'mse'                  
+optimizer="adam"              
+dropout = 0.25                 
+batch_size = 12               
+epochs = 2                   
+window_len = 7               
+training_size = 0.8
+merge_date = '2016-01-01'
 
 def get_market_data(market, tag=True):
     """
@@ -30,7 +40,9 @@ def get_market_data(market, tag=True):
     market_data = pd.read_html("https://coinmarketcap.com/currencies/" + market + 
                                 "/historical-data/?start=20130428&end="+time.strftime("%Y%m%d"), flavor='html5lib')[2]
     market_data = market_data.assign(Date=pd.to_datetime(market_data['Date']))  
+    
     market_data['Volume'] = (pd.to_numeric(market_data['Volume'], errors='coerce').fillna(0))
+    market_data.columns = [market_data.columns[0]] + [i.replace('*','') for i in market_data.columns[1:]]
     if tag:
         market_data.columns = [market_data.columns[0]] + [tag + '_' + i for i in market_data.columns[1:]]
     return market_data
@@ -45,8 +57,8 @@ def show_plot(data, tag):
     ax1.set_xticklabels('')
     ax2.set_xticks([datetime.date(i,j,1) for i in range(2013,2019) for j in [1,7]])
     ax2.set_xticklabels([datetime.date(i,j,1).strftime('%b %Y')  for i in range(2013,2019) for j in [1,7]])
-    ax1.plot(data['Date'].astype(datetime.datetime),data[tag +'_Open'])
-    ax2.bar(data['Date'].astype(datetime.datetime).values, data[tag +'_Volume'].values)
+    ax1.plot(data['Date'].astype('datetime64'),data[tag +'_Open'])
+    ax2.bar(data['Date'].astype('datetime64').values, data[tag +'_Volume'].values)
     fig.tight_layout()
     plt.show()
   
@@ -149,7 +161,8 @@ def split_data(data, training_size=0.8):
     return data[:int(training_size*len(data))], data[int(training_size*len(data)):]
 
 
-def create_inputs(data, coins=['BTC', 'ETH'], window_len=window_len):
+# def create_inputs(data, coins=['BTC', 'ETH'], window_len=window_len):
+def create_inputs(data, coins=['BTC'], window_len=window_len):
     """
     data: pandas DataFrame, this could be either training_set or test_set
     coins: coin datas which will be used as the input. Default is 'btc', 'eth'
@@ -187,15 +200,15 @@ def to_array(data):
     x = [np.array(data[i]) for i in range (len(data))]
     return np.array(x)
 
-
+train_set = test_set = market_data
 train_set = train_set.drop('Date', 1)
 test_set = test_set.drop('Date', 1)
 X_train = create_inputs(train_set)
 Y_train_btc = create_outputs(train_set, coin='BTC')
 X_test = create_inputs(test_set)
 Y_test_btc = create_outputs(test_set, coin='BTC')
-Y_train_eth = create_outputs(train_set, coin='ETH')
-Y_test_eth = create_outputs(test_set, coin='ETH')
+# Y_train_eth = create_outputs(train_set, coin='ETH')
+# Y_test_eth = create_outputs(test_set, coin='ETH')
 X_train, X_test = to_array(X_train), to_array(X_test)
 
 def build_model(inputs, output_size, neurons, activ_func=activation_function, dropout=dropout, loss=loss, optimizer=optimizer):
@@ -224,16 +237,6 @@ def build_model(inputs, output_size, neurons, activ_func=activation_function, dr
     model.summary()
     return model
 
-neurons = 512                 
-activation_function = 'tanh'  
-loss = 'mse'                  
-optimizer="adam"              
-dropout = 0.25                 
-batch_size = 12               
-epochs = 53                   
-window_len = 7               
-training_size = 0.8
-merge_date = '2016-01-01'
 
 # clean up the memory
 gc.collect()

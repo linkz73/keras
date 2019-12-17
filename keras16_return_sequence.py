@@ -28,7 +28,7 @@ model.add(LSTM(3))
 model.add(Dense(5))
 model.add(Dense(1))
 model.summary()
-
+'''
 # 3. 실행
 model.compile(optimizer='adam', loss='mse', metrics=['mse'])
 
@@ -44,3 +44,4 @@ x_input = x_input.reshape((1,3,1))
 
 yhat = model.predict(x_input)
 print(yhat)
+'''
