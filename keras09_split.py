@@ -1,12 +1,13 @@
+# 데이터를 train, val, test 로 자름
+
 #1. 데이터
 import numpy as np
 x = np.array(range(1, 101))
 y = np.array(range(1, 101))
-print(x)
 
-x_train = x[:60]
-x_val = x[60:80]
-x_test = x[80:]
+x_train = x[:60]  # (60,) numpy.ndarray
+x_val = x[60:80]  # (20,) numpy.ndarray
+x_test = x[80:]   # (20,) numpy.ndarray
 y_train = y[:60]
 y_val = y[60:80]
 y_test = y[80:]

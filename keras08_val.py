@@ -1,6 +1,8 @@
+# validation 을 통한 모델 fit 을 통해 정확도, 오류를 향상 시킴
+
 #1. 데이터
 import numpy as np
-x_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+x_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  # (10,) 벡터, type : numpy.ndarray
 y_train = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
 x_test = np.array([11,12,13,14,15,16,17,18,19,20])
 y_test = np.array([11,12,13,14,15,16,17,18,19,20])

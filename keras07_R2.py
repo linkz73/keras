@@ -1,3 +1,6 @@
+# R2 : regression 모델의 정확도를 나타내며, 1이 최고값.
+# RMSE : regression 모델의 경우 오류를 측정하는 지표, 낮을 수록 우수, 0이 최고값
+
 from keras.models import Sequential
 from keras.layers import Dense
 import numpy as np

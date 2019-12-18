@@ -1,6 +1,8 @@
+# sklearn 의 train_test_split 을 이용해 split 수행
+
 #1. 데이터
 import numpy as np
-x = np.array(range(1, 101))
+x = np.array(range(1, 101))  # (100,), ndarray
 y = np.array(range(1, 101))
 print(x)
 
@@ -13,7 +15,8 @@ print(x)
 
 from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import cross_val_score
-# train, test 둘다 적용시 train 이 적용됨.
+# random_state : 랜덤시드를 부여해 랜덤 함수라 해도 검증 시에도 동일한 결과를 나오도록
+# train_size, test_size 옵션을 둘다 적용시 train_size 이 적용됨. 
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=3, test_size=0.4)
 x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, random_state=3, test_size=0.5)
 
@@ -22,8 +25,8 @@ print(f"x_train:{len(x_train)}, x_test:{len(x_test)}, x_val:{len(x_val)}")
 #2. 모델구성
 from keras.models import Sequential
 from keras.layers import Dense
-model = Sequential()
 
+model = Sequential()
 # model.add(Dense(100, input_dim=1, activation='relu'))
 model.add(Dense(100, input_shape=(1, ), activation='relu'))
 model.add(Dense(100))

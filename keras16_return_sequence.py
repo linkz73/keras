@@ -20,6 +20,7 @@ model = Sequential()
 # input_shape(컬럼수, 컬럼을 몇개씩 잘라서 작업할 것인지)
 # LSTM 은 None, 3, 1 로 shape 로 3차원 텐서를 입력값으로 받음
 # input : None,3,1 --> out: None,3,10 / return_sequences 의 디폴트는 False : 디멘션을 맞춰줌.
+# LSTM 에서 LSTM 모델로 값을 전달하는 경우는 return_sequence 로 디멘션을 유지해서 넘겨야 함
 model.add(LSTM(10, activation='relu', input_shape=(3,1), return_sequences=True))
 # model.add(LSTM(10, activation='relu', return_sequences=True))
 # LSTM 은 3차원 텐서를 입력값으로 받아야 함. 위의 아웃풋은 10이므로 (None, 10)으로 2차원으로 넘어오므로 오류

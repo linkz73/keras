@@ -56,6 +56,7 @@ def comma_percent(x, pos):  # formatter function takes tick label and tick posit
 
 def convZigzag(p):    
     p = p.set_index(p['date'].values)
+    print("p : ", p)
     p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
     pivots = peak_valley_pivots(p['close'].values, 0.02, -0.02)
     fig = plt.figure(constrained_layout=False,figsize=(20,7))
@@ -64,6 +65,7 @@ def convZigzag(p):
     
     ts_pivots = pd.Series(p['close'], index=p.index)
     ts_pivots = ts_pivots[pivots != 0]
+    print("ts_pivots", ts_pivots)
 
     p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
@@ -82,7 +84,7 @@ frame = '30m'
 '''
 
 # df = get_price(종목, 시작일자, 종료일자, 테이블)
-df = pd.read_csv('price/dataset/btcusdt_30m.csv')
+df = pd.read_csv('lstm_test/dataset/btcusdt_30m.csv')
 print(df.head())
 
 df['ZigZag'] = convZigzag(df)
@@ -149,7 +151,7 @@ model.fit(x_train, y_train,
     epochs=20,
     callbacks=[
         # TensorBoard(log_dir='logs/%s' % (start_time)),
-        ModelCheckpoint('./price/models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
+        ModelCheckpoint('./lstm_test/models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
         ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=1, mode='auto')
 ])
 

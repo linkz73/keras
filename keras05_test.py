@@ -10,13 +10,13 @@ x_predict = np.array([21,22,23,24,25])
 
 model = Sequential()
 # model.add(Dense(100, input_dim=1, activation='relu'))
-model.add(Dense(100, input_shape=(1, ), activation='relu'))
-model.add(Dense(80))
+model.add(Dense(100, input_shape=(1, ), activation='relu'))  # (none, 100)
+model.add(Dense(80))  # (none, 80)
 model.add(Dense(60))
 model.add(Dense(30))
 model.add(Dense(10))
 model.add(Dense(3))
-model.add(Dense(1))
+model.add(Dense(1))  # (none, 1)
 
 model.summary()
 
