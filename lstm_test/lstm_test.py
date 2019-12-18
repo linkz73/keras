@@ -1,7 +1,7 @@
 import pandas as pd
 from pandas import DataFrame
 import pandas.io.sql as pdsql
-# from pandasql import sqldf
+from pandasql import sqldf
 import datetime
 import numpy as np
 import matplotlib.pyplot as plt
@@ -55,7 +55,8 @@ def comma_percent(x, pos):  # formatter function takes tick label and tick posit
 #     return pivots
 
 def convZigzag(p):    
-    p = p.set_index(p['date'].values)
+    # p = p.set_index(p['date'].values)
+    p = p.set_index(p['date'])
     print("p : ", p)
     p['date'] = pd.to_datetime(p['date'], errors='coerce').apply(lambda x:x.strftime('%Y%m%d'))
     pivots = peak_valley_pivots(p['close'].values, 0.02, -0.02)
@@ -65,33 +66,60 @@ def convZigzag(p):
     
     ts_pivots = pd.Series(p['close'], index=p.index)
     ts_pivots = ts_pivots[pivots != 0]
-    print("ts_pivots", ts_pivots)
 
-    p['date'] = p.index.map(mdates.date2num)
+    # p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax1.plot(p.index, p['close'])
     ts_pivots.plot(style='g-o')
     plt.show()
     return pivots
 
-'''
 시작일자 = '2019-10-10'
 종료일자 = '2019-11-30'
-거래소 = "upbit"
-종목 = 'BTC/KRW'
-frame = '30m'
-테이블 = f"data_{frame}_{거래소}"
-'''
 
 # df = get_price(종목, 시작일자, 종료일자, 테이블)
 df = pd.read_csv('lstm_test/dataset/btcusdt_30m.csv')
+
+query_tmp = f"SELECT * FROM df WHERE date > '{시작일자}' AND date < '{종료일자}'"
+df = sqldf(query_tmp, locals())
+# last_day = df_tmp.values[0][0][0:10]
 print(df.head())
 
 df['ZigZag'] = convZigzag(df)
 # df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
 df['TREND'] = df['ZigZag'].replace(to_replace=0, method='ffill')
-trends = df['TREND'].values
-print(trends)
+
+# 1. 데이터 전처리
+X1 = df['close'].values
+X2 = df['volume'].values
+y = df['TREND'].values
+
+size = 50
+def split_x(seq, size):
+    aaa = []
+    for i in range(len(seq) - size + 1):
+        subset = seq[i:(i+size)]
+        aaa.append([item for item in subset])
+    return np.array(aaa)
+
+X1 = split_x(X1, size)
+X2 = split_x(X2, size)
+y = split_x(y, size)
+
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
+scaler = MinMaxScaler()
+# scaler = StandardScaler()
+# scaler.fit(x)  # fit 을 하면서 가중치가 생성됨.
+# x = scaler.transform(x)
+X1 = scaler.fit_transform(X1)
+X2 = scaler.fit_transform(X2)
+
+print(X1)
+print(X2)
+
+print("X1 shape", X1.shape)
+print("X2 shape", X2.shape)
+print("y shape", y.shape)
 
 high_prices = df['high'].values
 low_prices = df['low'].values
