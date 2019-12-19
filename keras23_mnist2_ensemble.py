@@ -55,16 +55,16 @@ print("Y2_test.shape :", Y2_test.shape)  # (5000,)
 '''
 Y_train = np_utils.to_categorical(Y_train)
 Y_test = np_utils.to_categorical(Y_test)
-Y1_train = Y_train[:30000,]  # (30000,)
-Y2_train = Y_train[30000:,]  # (30000,)
-Y1_test = Y_test[:5000,]  # (5000,)
-Y2_test = Y_test[5000:,]  # (5000,)
+Y1_train = Y_train[:30000,]  # (30000,10)
+Y2_train = Y_train[30000:,]  # (30000,10)
+Y1_test = Y_test[:5000,]  # (5000,10)
+Y2_test = Y_test[5000:,]  # (5000,10)
 
 print(Y1_test[0])  #[0. 0. 0. 0. 0. 0. 0. 1. 0. 0.]
-print("Y1_train.shape",Y1_train.shape)  # (30000,)
-print("Y2_train.shape",Y2_train.shape)  # (30000,)
-print("Y1_test.shape",Y1_test.shape)  # (5000,)
-print("Y2_test.shape",Y2_test.shape)  # (5000,)
+print("Y1_train.shape",Y1_train.shape)  # (30000,10)
+print("Y2_train.shape",Y2_train.shape)  # (30000,10)
+print("Y1_test.shape",Y1_test.shape)  # (5000,10)
+print("Y2_test.shape",Y2_test.shape)  # (5000,10)
 
 # 컨볼루션 신경망의 설정
 input1 = Input(shape=(28,28,1))

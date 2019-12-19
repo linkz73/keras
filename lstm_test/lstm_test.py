@@ -8,10 +8,10 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 from matplotlib.gridspec import GridSpec
 import matplotlib.dates as mdates
-from keras.models import Sequential
-from keras.layers import LSTM, Dropout, Dense, Activation
+
+from keras.models import Sequential, Model
+from keras.layers import LSTM, Dropout, Dense, Activation, Input
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
-import datetime
 
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -71,7 +71,7 @@ def convZigzag(p):
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax1.plot(p.index, p['close'])
     ts_pivots.plot(style='g-o')
-    plt.show()
+    # plt.show()
     return pivots
 
 시작일자 = '2019-10-10'
@@ -89,10 +89,13 @@ df['ZigZag'] = convZigzag(df)
 # df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
 df['TREND'] = df['ZigZag'].replace(to_replace=0, method='ffill')
 
+from keras.utils import np_utils
+
 # 1. 데이터 전처리
 X1 = df['close'].values
 X2 = df['volume'].values
 y = df['TREND'].values
+print(y.shape)  # (60000,)
 
 size = 50
 def split_x(seq, size):
@@ -103,8 +106,10 @@ def split_x(seq, size):
     return np.array(aaa)
 
 X1 = split_x(X1, size)
+X1 = X1[:-1,:]
 X2 = split_x(X2, size)
-y = split_x(y, size)
+X2 = X2[:-1,:]
+y = y[size:,]
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 scaler = MinMaxScaler()
@@ -114,77 +119,74 @@ scaler = MinMaxScaler()
 X1 = scaler.fit_transform(X1)
 X2 = scaler.fit_transform(X2)
 
+X1 = np.reshape(X1, (X1.shape[0], X1.shape[1], 1))
+X2 = np.reshape(X2, (X2.shape[0], X2.shape[1], 1))
+# y = np.reshape(y, (y.shape[0], y.shape[1], 1))
 print(X1)
 print(X2)
+print(y)
+print(y.shape)
 
-print("X1 shape", X1.shape)
-print("X2 shape", X2.shape)
-print("y shape", y.shape)
+# high_prices = df['high'].values
+# low_prices = df['low'].values
+# mid_prices = (high_prices + low_prices) / 2
+# seq_len = 50
+# sequence_length = seq_len + 1
 
-high_prices = df['high'].values
-low_prices = df['low'].values
-mid_prices = (high_prices + low_prices) / 2
-seq_len = 50
-sequence_length = seq_len + 1
+from sklearn.model_selection import train_test_split
+X1_train, X1_test, X2_train, X2_test = train_test_split(X1, X2, random_state=3, test_size=0.4)
+X1_val, X1_test, X2_val, X2_test = train_test_split(X1_test, X2_test, random_state=3, test_size=0.5)
+y_train, y_test = train_test_split(y, random_state=3, test_size=0.4)
+y_val, y_test = train_test_split(y_test, random_state=3, test_size=0.5)
 
-# from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler
-# scaler = MaxAbsScaler()
-# scaler.fit(x)  # fit 을 하면서 가중치가 생성됨.
-# x = scaler.transform(x)
+print("X1_train shape", X1_train.shape)  # (1062,50,1)
+print("X2_train shape", X2_train.shape)  # (1062,50,1)
+print("X1_test shape", X1_test.shape)  # (355,50,1)
+print("X2_test shape", X2_test.shape)  # (355,50,1)
+print("X1_val shape", X1_val.shape)  # (355,50,1)
+print("X2_val shape", X2_val.shape)  # (355,50,1)
+print("y_train shape", y_train.shape)  # (1062,)
+print("y_test shape", y_test.shape)  # (355,)
+print("y_val shape", y_val.shape)  # (354,)
 
-result = []
-for index in range(len(mid_prices) - sequence_length):
-    result.append(mid_prices[index: index + sequence_length])
+input1 = Input(shape=(50,1))
+layers = LSTM(50, return_sequences=True, activation='relu')(input1)
+layers = LSTM(64, activation='relu')(layers)
+middle1 = Dropout(0.5)(layers)
 
-def normalize_windows(data):
-    normalized_data = []
-    for window in data:
-        normalized_window = [((float(p) / float(window[0])) - 1) for p in window]
-        normalized_data.append(normalized_window)
-    return np.array(normalized_data)
+input2 = Input(shape=(50,1))
+layers2 = LSTM(50, return_sequences=True, activation='relu')(input2)
+layers2 = LSTM(64, activation='relu')(layers2)
+middle2 = Dropout(0.5)(layers2)
 
-result = normalize_windows(result)
+from keras.layers.merge import concatenate
+merge1 = concatenate([middle1, middle2])  # output 만 묶어 주면 됨.
+output1 = Dense(1, activation='relu')(merge1)
 
-# split train and test data
-row = int(round(result.shape[0] * 0.9))
-train = result[:row, :]
-np.random.shuffle(train)
-
-x_train = train[:, :-1]
-x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], 1))
-y_train = train[:, -1]
-
-x_test = result[row:, :-1]
-x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
-y_test = result[row:, -1]
-
-x_train.shape, x_test.shape
-
-
-model = Sequential()
-model.add(LSTM(50, return_sequences=True, input_shape=(50, 1)))
-model.add(Dropout(0.5))  # 과적합을 피하기 위한 drop out 20% 설정
-# return_sequences=False 디폴트 값
-model.add(LSTM(64, return_sequences=False))
-model.add(Dense(1, activation='linear'))
-
-model.compile(loss='mse', optimizer='rmsprop')
+model = Model(inputs = [input1, input2], outputs = output1)
 model.summary()
 
+from keras.callbacks import EarlyStopping
+
+model.compile(loss='mse', optimizer='adam', metrics=['mse'])
+early_stopping_callback = EarlyStopping(monitor='val_loss', patience=10)
 
 start_time = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-model.fit(x_train, y_train,
-    validation_data=(x_test, y_test),
+model.fit([X1_train,X2_train], y_train,
+    validation_data=([X1_val,X2_val], y_val),
     batch_size=10,
+    verbose=1,
     epochs=20,
     callbacks=[
         # TensorBoard(log_dir='logs/%s' % (start_time)),
+        early_stopping_callback,
         ModelCheckpoint('./lstm_test/models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
-        ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=1, mode='auto')
+        # ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=1, mode='auto')
 ])
 
+
 # 예측 결과를 그래프로 표현
-pred = model.predict(x_test)
+pred = model.predict([X1_test,X2_test])
 print(pred)
 fig = plt.figure(facecolor='white', figsize=(20, 10))
 ax = fig.add_subplot(111)
