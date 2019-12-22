@@ -69,8 +69,8 @@ def convZigzag(p):
 
     # p['date'] = p.index.map(mdates.date2num)
     ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-    ax1.plot(p.index, p['close'])
-    ts_pivots.plot(style='g-o')
+    # ax1.plot(p.index, p['close'])
+    # ts_pivots.plot(style='g-o')
     # plt.show()
     return pivots
 
@@ -85,8 +85,8 @@ df = sqldf(query_tmp, locals())
 # last_day = df_tmp.values[0][0][0:10]
 print(df.head())
 
-df['ZigZag'] = convZigzag(df)
-# df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
+# df['ZigZag'] = convZigzag(df)
+df['ZigZag'] = peak_valley_pivots(df['close'].values, 0.03, -0.03)
 df['TREND'] = df['ZigZag'].replace(to_replace=0, method='ffill')
 
 from keras.utils import np_utils
@@ -109,6 +109,7 @@ X1 = split_x(X1, size)
 X1 = X1[:-1,:]
 X2 = split_x(X2, size)
 X2 = X2[:-1,:]
+# y 값은 x를 lstm 모델에 맞도록 앞에서 사이즈만큼 잘라주어야 함.
 y = y[size:,]
 
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
@@ -126,7 +127,8 @@ print(X1)
 print(X2)
 print(y)
 print(y.shape)
-
+# -1,1 값의 범위를 0,1 로 변환
+y = (y + 1)/2
 # high_prices = df['high'].values
 # low_prices = df['low'].values
 # mid_prices = (high_prices + low_prices) / 2
@@ -139,54 +141,62 @@ X1_val, X1_test, X2_val, X2_test = train_test_split(X1_test, X2_test, random_sta
 y_train, y_test = train_test_split(y, random_state=3, test_size=0.4)
 y_val, y_test = train_test_split(y_test, random_state=3, test_size=0.5)
 
+y1_train = np_utils.to_categorical(y_train)
+y1_test = np_utils.to_categorical(y_test)
+y1_val = np_utils.to_categorical(y_val)
+
 print("X1_train shape", X1_train.shape)  # (1062,50,1)
 print("X2_train shape", X2_train.shape)  # (1062,50,1)
 print("X1_test shape", X1_test.shape)  # (355,50,1)
-print("X2_test shape", X2_test.shape)  # (355,50,1)
+print("X2_test shape", X2_test.shape)  # (354,50,1)
 print("X1_val shape", X1_val.shape)  # (355,50,1)
-print("X2_val shape", X2_val.shape)  # (355,50,1)
-print("y_train shape", y_train.shape)  # (1062,)
-print("y_test shape", y_test.shape)  # (355,)
-print("y_val shape", y_val.shape)  # (354,)
+print("X2_val shape", X2_val.shape)  # (354,50,1)
+print("y_train shape", y_train.shape)  # (1062,2)
+print("y_test shape", y1_test.shape)  # (355,2)
+print("y_val shape", y_val.shape)  # (354,2)
 
 input1 = Input(shape=(50,1))
-layers = LSTM(50, return_sequences=True, activation='relu')(input1)
+layers = LSTM(200, return_sequences=True, activation='relu')(input1)
 layers = LSTM(64, activation='relu')(layers)
 middle1 = Dropout(0.5)(layers)
 
 input2 = Input(shape=(50,1))
-layers2 = LSTM(50, return_sequences=True, activation='relu')(input2)
+layers2 = LSTM(120, return_sequences=True, activation='relu')(input2)
 layers2 = LSTM(64, activation='relu')(layers2)
 middle2 = Dropout(0.5)(layers2)
 
 from keras.layers.merge import concatenate
 merge1 = concatenate([middle1, middle2])  # output 만 묶어 주면 됨.
-output1 = Dense(1, activation='relu')(merge1)
+# output1 = Dense(1, activation='relu')(merge1)
+output1 = Dense(2, activation='softmax')(merge1)
 
 model = Model(inputs = [input1, input2], outputs = output1)
 model.summary()
 
 from keras.callbacks import EarlyStopping
 
-model.compile(loss='mse', optimizer='adam', metrics=['mse'])
-early_stopping_callback = EarlyStopping(monitor='val_loss', patience=10)
+# model.compile(loss='mse', optimizer='adam', metrics=['mse'])
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+early_stopping_callback = EarlyStopping(monitor='val_acc', patience=10)
 
 start_time = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
-model.fit([X1_train,X2_train], y_train,
-    validation_data=([X1_val,X2_val], y_val),
+model.fit([X1_train,X2_train], y1_train,
+    validation_data=([X1_val,X2_val], y1_val),
     batch_size=10,
-    verbose=1,
-    epochs=20,
+    verbose=2,
+    epochs=1000,
     callbacks=[
         # TensorBoard(log_dir='logs/%s' % (start_time)),
         early_stopping_callback,
-        ModelCheckpoint('./lstm_test/models/%s_eth.h5' % (start_time), monitor='val_loss', verbose=1, save_best_only=True, mode='auto'),
+        ModelCheckpoint('./lstm_test/models/%s_eth.h5' % (start_time), monitor='val_acc', verbose=1, save_best_only=True, mode='auto'),
         # ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=5, verbose=1, mode='auto')
 ])
 
 
 # 예측 결과를 그래프로 표현
 pred = model.predict([X1_test,X2_test])
+pred = list(map(lambda x:np.argmax(x), pred))
+# print("\n Test Accuracy: %.4f" % (model.evaluate([X1_test,X2_test], y_test)[0]))
 print(pred)
 fig = plt.figure(facecolor='white', figsize=(20, 10))
 ax = fig.add_subplot(111)

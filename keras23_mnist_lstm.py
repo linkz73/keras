@@ -45,7 +45,7 @@ model = Sequential()
 # 인풋 shape : 28 x 28 x 1
 model.add(LSTM(3, input_shape=(28*28,1), activation='relu'))
 model.add(Dropout(0.5))
-model.add(Dense(128, activation='relu'))
+model.add(Dense(10, activation='relu'))
 model.add(Dense(10, activation='softmax'))
 # model.summary()
 
@@ -58,4 +58,6 @@ history = model.fit(X_train, Y_train, validation_data=(X_test, Y_test), epochs=1
                     callbacks=[early_stopping_callback])  # checkpointer
 
 # 테스트 정확도 출력
+pred = model.predict(X_test, Y_test)
+print(pred)
 print("\n Test Accuracy: %.4f" % (model.evaluate(X_test, Y_test)[1]))
