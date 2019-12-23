@@ -1,22 +1,14 @@
+# Multi Layer Perceptron
 #1. 데이터
 import numpy as np
 x = np.array(range(1,201)).reshape((2,100))
 y = np.array(range(1,201)).reshape((2,100))
-# x = np.array([range(1, 101), range(101, 200)])
-# y = np.array([range(1, 101), range(101, 200)])
 print(x)
-print(x.shape)
+print(x.shape) # (2,100)
 x = np.transpose(x)
 y = np.transpose(y)
 print(x)
-print(x.shape)
-
-# x_train = x[:60]
-# x_val = x[60:80]
-# x_test = x[80:]
-# y_train = y[:60]
-# y_val = y[60:80]
-# y_test = y[80:]
+print(x.shape) # (100,2)
 
 from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import cross_val_score

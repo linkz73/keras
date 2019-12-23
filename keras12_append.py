@@ -7,14 +7,14 @@ y2 = np.array([range(501, 601), range(711,811), range(100)])
 
 x = np.concatenate([x1, x2])
 y = np.concatenate([y1, y2])
-print(x.shape)
-print(y.shape)
+print(x.shape)  # (6,100)
+print(y.shape)  # (6,100)
 
 # x1 = np.transpose(x1)
 x = x.T
 y = y.T
-print(x.shape)
-print(y.shape)
+print(x.shape)  #(100,6)
+print(y.shape)  #(100,6)
 # print(y.shape)
 
 from sklearn.model_selection import train_test_split

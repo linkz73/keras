@@ -17,14 +17,15 @@ x2 = x2.T
 y2 = y2.T
 y3 = y3.T
 
-print(x1.shape)
-print(x2.shape)
-print(y1.shape)
-print(y2.shape)
-print(y3.shape)
+print(x1.shape)  #(100,3)
+print(x2.shape)  #(100,3)
+print(y1.shape)  #(100,3)
+print(y2.shape)  #(100,3)
+print(y3.shape)  #(100,3)
 
 # train : test : val = 6 : 2 : 2
 from sklearn.model_selection import train_test_split
+# train_test_split 사용시 인자는 항상 행이 동일해야 함
 x1_train, x1_test, y1_train, y1_test = train_test_split(x1, y1, shuffle=False, random_state=3, test_size=0.4)
 x1_val, x1_test, y1_val, y1_test = train_test_split(x1_test, y1_test, random_state=3, test_size=0.5)
 x2_train, x2_test, y2_train, y2_test = train_test_split(x2, y2, shuffle=False, random_state=3, test_size=0.4)
@@ -87,6 +88,7 @@ print("mse1 : ", mse)
 # 모델의 갯수 만큼 mse가 리스트 형태로 출력됨.
 # print("loss1 : ", loss)
 
+# 인풋2, 아웃풋 3 모델로 구성했으므로 predict 도 3개가 나옴.
 y1_predict,y2_predict,y3_predict = model.predict([x1_test,x2_test])
 print(y1_predict)
 print(y2_predict)

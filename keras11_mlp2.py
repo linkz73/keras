@@ -1,3 +1,4 @@
+# Multi Layer Perceptron
 #1. 데이터
 import numpy as np
 
@@ -12,7 +13,7 @@ print(x.shape)  # (100, 2)
 
 from sklearn.model_selection import train_test_split
 # from sklearn.model_selection import cross_val_score
-# train, test 둘다 적용시 train 이 적용됨. train_test_split : 컬럼의 차이가 있어도 행 길이 알아서 자름.
+# train, test 둘다 적용시 train 이 적용됨. train_test_split : 컬럼의 차이가 있어도 행 길이 알아서 자름. x,y는 행이 같아야 함
 x_train, x_test, y_train, y_test = train_test_split(x, y, random_state=3, test_size=0.4, shuffle=False)
 x_val, x_test, y_val, y_test = train_test_split(x_test, y_test, random_state=3, test_size=0.5, shuffle=False)
 

@@ -1,3 +1,4 @@
+# 모델을 함수 형식으로 구성
 #1. 데이터
 import numpy as np
 

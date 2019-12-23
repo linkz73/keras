@@ -9,13 +9,14 @@ x2 = np.array([range(100, 200), range(311,411), range(100,200)])
 y = np.array([range(501, 601), range(311,411), range(100,200)])
 
 # x1 = np.transpose(x1)
+# transpose는 벡터 형태를 제외하고 적용 가능
 x1 = x1.T
 x2 = x2.T
 y = y.T
 
-print(x1.shape)
-print(x2.shape)
-print(y.shape)
+print(x1.shape)  #(100,3)
+print(x2.shape)  #(100,3)
+print(y.shape)  #(100,3)
 
 # train : test : val = 6 : 2 : 2
 from sklearn.model_selection import train_test_split
@@ -24,6 +25,7 @@ from sklearn.model_selection import train_test_split
 # y_train, y_test = train_test_split(y, shuffle=False, random_state=3, test_size=0.4)
 # y_val, y_test = train_test_split(y_test, shuffle=False, random_state=3, test_size=0.5)
 
+# train_test_split 는 행 갯수가 동일해야 함
 x1_train, x1_test, y_train, y_test = train_test_split(x1, y, shuffle=False, random_state=3, test_size=0.4)
 x1_val, x1_test, y_val, y_test = train_test_split(x1_test, y_test, random_state=3, test_size=0.5)
 x2_train, x2_test = train_test_split(x2, shuffle=False, random_state=3, test_size=0.4)
@@ -72,6 +74,7 @@ print("mse1 : ", mse)
 # 모델의 갯수 만큼 mse가 리스트 형태로 출력됨.
 # print("loss1 : ", loss)
 
+# 인풋2, 아웃풋1 앙상블 모델이므로 아웃풋은 1
 y_predict = model.predict([x1_test,x2_test])
 print(y_predict)
 

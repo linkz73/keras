@@ -13,9 +13,9 @@ x1 = x1.T
 y1 = y1.T
 y2 = y2.T
 
-print(x1.shape)
-print(y1.shape)
-print(y2.shape)
+print(x1.shape)  #(100,3)
+print(y1.shape)  #(100,3)
+print(y2.shape)  #(100,3)
 
 # train : test : val = 6 : 2 : 2
 from sklearn.model_selection import train_test_split
@@ -68,6 +68,7 @@ print("mse1 : ", mse)
 # 모델의 갯수 만큼 mse가 리스트 형태로 출력됨.
 # print("loss1 : ", loss)
 
+# 인풋1, 아웃풋2 앙상블 모델이므로 아웃풋은 2
 y1_predict,y2_predict = model.predict(x1_test)
 print(y1_predict)
 print(y2_predict)
